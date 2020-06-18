@@ -25,10 +25,10 @@ module.exports = function (config) {
     },
 
     coverageReporter: {
-        reporters: [
-            // generates ./coverage/coverage-final.json
-            {type:'json', subdir: '.'},
-        ]
+      reporters: [
+          // generates ./coverage/coverage-final.json
+          {type: 'json', subdir: '.'}
+      ]
     },
 
     htmlReporter: { // info at https://github.com/dtabuenc/karma-html-reporter

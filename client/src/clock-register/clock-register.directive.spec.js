@@ -1,3 +1,5 @@
+'use strict';
+
 describe('dojo clock register directive', function () {
   var authenticationForm,
       $compile,
@@ -44,25 +46,53 @@ describe('dojo clock register directive', function () {
         expect(list[0]).toBeDefined();
       });
 
-      it('after clicking the button, should show the time in the list', function () {
-        var firstItem;
+      describe('after clicking the button', function () {
+        it('in case of success, should show the time in the list', function () {
+          var firstItem;
 
-        $httpBackend.expect('POST', '/api/v1/clock/hit').respond(200, {time: '16:20:00'});
-        hitThePointBtn.click();
-        $httpBackend.flush();
+          $httpBackend.expect('POST', '/api/v1/clock/hit').respond(200, {time: '16:20:00'});
+          hitThePointBtn.click();
+          $httpBackend.flush();
 
-        firstItem = element.find('#daily-list :eq(0)');
+          firstItem = element.find('#daily-list :eq(0)');
 
-        expect(firstItem.text()).toBe('16:20:00');
-      });
+          expect(firstItem.text()).toBe('16:20:00');
+        });
 
-      it('error paths?', function () {
-        // TODO
+        it('if session is lost, should warn the user with message', function (done) {
+          var feedbackMessage;
+
+          spyOn(window, 'alert');
+
+          $httpBackend.expect('POST', '/api/v1/clock/hit').respond(401, {message: 'Ocorreu algum erro desconhecido no servidor.'});
+          hitThePointBtn.click();
+          $httpBackend.flush();
+
+          expect(window.alert).toHaveBeenCalledWith('Ocorreu algum erro desconhecido no servidor.');
+
+          // feedbackMessage = element.find('#feedback-message');
+          //
+          // expect(feedbackMessage).toBeDefined();
+          // expect(feedbackMessage.text()).toBe('Ocorreu algum erro desconhecido no servidor.');
+          // expect(feedbackMessage.hasClass('error')).toBe(true);
+        });
+
+        it('if "RondaWeb" is down, should tell it to the user', function () {
+          var feedbackMessage;
+
+          $httpBackend.expect('POST', '/api/v1/clock/hit').respond(500, {message: 'RondaWeb tá fora!'});
+          hitThePointBtn.click();
+          $httpBackend.flush();
+
+          feedbackMessage = element.find('#feedback-message');
+          expect(feedbackMessage).toBeDefined();
+          expect(feedbackMessage.text()).toBe('RondaWeb tá fora!');
+          expect(feedbackMessage.hasClass('error')).toBe(true);
+        });
       });
 
       describe('multiple clicks', function () {
         beforeEach(function () {
-          // Impedir chamar a parada de bater o ponto em menos de um minuto
           $httpBackend.when('POST', '/api/v1/clock/hit').respond(200, {time: '16:20:00'});
 
           hitThePointBtn.click();
@@ -73,18 +103,15 @@ describe('dojo clock register directive', function () {
         });
 
         it('should ignore multiple clicks at the same second', function () {
-          var feedbackMessage;
-          feedbackMessage = element.find('#feedback-message');
+          var feedbackMessage = element.find('#feedback-message');
 
           expect(feedbackMessage).toBeDefined();
           expect(feedbackMessage.text()).toBe('Você é um banana!');
           expect(feedbackMessage.hasClass('error')).toBe(true);
-
-          // TODO: Message should disappear after some time...
         });
 
         it('should remove the warning message after 10s', function () {
-          feedbackMessage = element.find('#feedback-message');
+          var feedbackMessage = element.find('#feedback-message');
           expect(feedbackMessage.text()).toBe('Você é um banana!');
 
           // triggers all $timeout function calls
@@ -96,10 +123,10 @@ describe('dojo clock register directive', function () {
       });
     });
 
-    it('should handle "corujão" situations', function () {
+    xit('should handle "corujão" situations', function () {
     });
 
-    it('should use browser native notification', function () {
+    xit('should use browser native notification', function () {
     });
   });
 });

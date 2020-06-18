@@ -27,13 +27,15 @@
               setMessage('Você bateu o ponto com sucesso!', 'success');
               $scope.markings.push(res.data.time);
             }
-          }).catch(function (error) {
-            if (error.message) {
-              setMessage(error.message, 'error');
+          }).catch(function (res) {
+            // TODO remover esse if e colocar a lógica dentro dos cases com operador ||
+            if (res.data.message) {
+              setMessage(res.data.message, 'error');
               return;
             }
 
-            switch (error.status) {
+            switch (res.status) {
+              // TODO fazer funcionar com o alert
               case 401: {
                 setMessage('Houve algum problema na autenticação do seus dados.', 'error');
                 break;
@@ -41,6 +43,11 @@
 
               case 404: {
                 setMessage('Servidor offline.', 'error');
+                break;
+              }
+
+              case 500: {
+                setMessage('Ocorreu algum erro desconhecido no servidor.', 'error');
                 break;
               }
 

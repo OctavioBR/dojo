@@ -38,7 +38,7 @@ describe('dojo clock register controller', function () {
 
     describe('server errors', function () {
       it('response auth error', function () {
-        $httpBackend.when('POST', '/api/v1/clock/hit').respond(401, 'Houve algum problema na autenticação do seus dados.');
+        $httpBackend.when('POST', '/api/v1/clock/hit').respond(401, {message: 'Houve algum problema na autenticação do seus dados.'});
         $scope.hitThePoint();
         $httpBackend.flush();
         expect($scope.message.text).toEqual('Houve algum problema na autenticação do seus dados.');
@@ -57,7 +57,7 @@ describe('dojo clock register controller', function () {
         $httpBackend.when('POST', '/api/v1/clock/hit').respond(500, {});
         $scope.hitThePoint();
         $httpBackend.flush();
-        expect($scope.message.text).toEqual('Aconteceu algum erro com o servidor :(');
+        expect($scope.message.text).toEqual('Ocorreu algum erro desconhecido no servidor.');
         expect($scope.message.type).toEqual('error');
       });
     });
